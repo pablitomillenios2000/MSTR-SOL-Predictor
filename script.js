@@ -29,6 +29,13 @@ function generateData() {
     const portfolioMstr = [];
     const portfolioSol = []; // New portfolio for SOL without bot
 
+    // Initial scaling factors to start each portfolio at the same initialPortfolioValue
+    const mstrScalingFactor = initialPortfolioValue / mstrStartPrice;
+    const solScalingFactor = initialPortfolioValue / solStartPrice;
+
+    // Calculate the end point for SOL bot to be 5x the regular SOL end price
+    const solBotEndPrice = solEndPrice * 5;
+
     for (let i = 0; i < months.length; i++) {
         // Calculate BTC price with exponential growth
         const btcGrowthFactor = Math.pow(btcEndPrice / btcStartPrice, i / (months.length - 1));
@@ -46,14 +53,15 @@ function generateData() {
         const solPrice = solStartPrice * solGrowthFactor;
         solPrices.push(solPrice);
 
-        // Calculate SOL trading bot price (5x SOL growth)
-        const solBotPrice = solPrice * 5;
+        // Calculate SOL bot price with a custom growth factor to reach 5x of solEndPrice
+        const solBotGrowthFactor = Math.pow(solBotEndPrice / solStartPrice, i / (months.length - 1));
+        const solBotPrice = solStartPrice * solBotGrowthFactor;
         solBotPrices.push(solBotPrice);
 
-        // Calculate portfolio values
-        const solBotPortfolioValue = initialPortfolioValue * (solBotPrice / (solStartPrice));
-        const mstrPortfolioValue = initialPortfolioValue * (mstrPrice / mstrStartPrice);
-        const solPortfolioValue = initialPortfolioValue * (solPrice / solStartPrice); // New SOL portfolio
+        // Calculate portfolio values with scaling to start at initialPortfolioValue
+        const solBotPortfolioValue = solScalingFactor * solBotPrice;
+        const mstrPortfolioValue = mstrScalingFactor * mstrPrice;
+        const solPortfolioValue = solScalingFactor * solPrice; // New SOL portfolio
 
         portfolioSolBot.push(solBotPortfolioValue);
         portfolioMstr.push(mstrPortfolioValue);
@@ -62,6 +70,9 @@ function generateData() {
 
     return { months, btcPrices, mstrPrices, solPrices, solBotPrices, portfolioSolBot, portfolioMstr, portfolioSol };
 }
+
+
+
 
 // Plot the data
 function plotData(data) {
