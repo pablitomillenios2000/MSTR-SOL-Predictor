@@ -16,7 +16,7 @@ let mstrNavPremium = mstrNavPremiumStart;
 let mstrStartPrice = navStartPerShare * mstrNavPremiumStart;
 let solEndPrice = 1800; // Initial SOL end price
 
-// Initial portfolio value for both portfolios
+// Initial portfolio value for all portfolios
 const initialPortfolioValue = 460000;
 
 // Generate BTC, MSTR, SOL, and SOL bot prices and portfolio values
@@ -27,6 +27,7 @@ function generateData() {
     const solBotPrices = [];
     const portfolioSolBot = [];
     const portfolioMstr = [];
+    const portfolioSol = []; // New portfolio for SOL without bot
 
     for (let i = 0; i < months.length; i++) {
         // Calculate BTC price with exponential growth
@@ -36,7 +37,6 @@ function generateData() {
 
         // Calculate MSTR price with exponential growth
         let mstrEndPrice = initialNAVFactor * btcPrice * mstrNavPremium;
-
         const mstrGrowthFactor = Math.pow(mstrEndPrice / mstrStartPrice, i / (months.length - 1));
         const mstrPrice = mstrStartPrice * mstrGrowthFactor;
         mstrPrices.push(mstrPrice);
@@ -51,14 +51,16 @@ function generateData() {
         solBotPrices.push(solBotPrice);
 
         // Calculate portfolio values
-        const solBotPortfolioValue = initialPortfolioValue * (solBotPrice / (solStartPrice * 5));
+        const solBotPortfolioValue = initialPortfolioValue * (solBotPrice / (solStartPrice));
         const mstrPortfolioValue = initialPortfolioValue * (mstrPrice / mstrStartPrice);
+        const solPortfolioValue = initialPortfolioValue * (solPrice / solStartPrice); // New SOL portfolio
 
         portfolioSolBot.push(solBotPortfolioValue);
         portfolioMstr.push(mstrPortfolioValue);
+        portfolioSol.push(solPortfolioValue); // Add value for new SOL portfolio
     }
 
-    return { months, btcPrices, mstrPrices, solPrices, solBotPrices, portfolioSolBot, portfolioMstr };
+    return { months, btcPrices, mstrPrices, solPrices, solBotPrices, portfolioSolBot, portfolioMstr, portfolioSol };
 }
 
 // Plot the data
@@ -117,13 +119,25 @@ function plotData(data) {
         line: { width: 3, color: 'red' }
     };
 
+    const portfolioSolTrace = { // New trace for SOL portfolio without trading bot
+        x: data.months,
+        y: data.portfolioSol,
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Portfolio with SOL (No Trading Bot)',
+        line: { width: 3, color: 'green' }
+    };
+
     const layout = {
-        title: 'Projected Portfolio Values: SOL Trading Bot vs. MSTR',
+        title: 'Projected Portfolio Values: SOL Trading Bot vs. MSTR vs. SOL (No Bot)',
         xaxis: { title: 'Date' },
         yaxis: { title: 'Value (USD)' }
     };
 
-    Plotly.newPlot('chart', [btcTrace, mstrTrace, solTrace, solBotTrace, portfolioSolBotTrace, portfolioMstrTrace], layout);
+    Plotly.newPlot('chart', [
+        btcTrace, mstrTrace, solTrace, solBotTrace,
+        portfolioSolBotTrace, portfolioMstrTrace, portfolioSolTrace // Add new trace here
+    ], layout);
 }
 
 // Initialize the chart with default values
