@@ -9,7 +9,11 @@ const months = [
 const btcStartPrice = 69000;
 const btcEndPrice = 400000;
 const solStartPrice = 166;
-let mstrNavPremium = 3; // Initial NAV premium for MSTR
+let initialNAVFactor = 0.001231;
+let navStartPerShare = initialNAVFactor * btcStartPrice;
+let mstrNavPremiumStart = 2.668; // Initial NAV premium for MSTR
+let mstrNavPremium = mstrNavPremiumStart;
+let mstrStartPrice = navStartPerShare * mstrNavPremiumStart;
 let solEndPrice = 1800; // Initial SOL end price
 
 // Initial portfolio value for both portfolios
@@ -17,8 +21,6 @@ const initialPortfolioValue = 460000;
 
 // Generate BTC, MSTR, SOL, and SOL bot prices and portfolio values
 function generateData() {
-    const mstrStartPrice = btcStartPrice * 3;
-    let mstrEndPrice = btcEndPrice * mstrNavPremium;
     const btcPrices = [];
     const mstrPrices = [];
     const solPrices = [];
@@ -33,6 +35,8 @@ function generateData() {
         btcPrices.push(btcPrice);
 
         // Calculate MSTR price with exponential growth
+        let mstrEndPrice = initialNAVFactor * btcPrice * mstrNavPremium;
+
         const mstrGrowthFactor = Math.pow(mstrEndPrice / mstrStartPrice, i / (months.length - 1));
         const mstrPrice = mstrStartPrice * mstrGrowthFactor;
         mstrPrices.push(mstrPrice);
