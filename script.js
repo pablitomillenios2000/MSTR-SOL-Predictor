@@ -17,7 +17,7 @@ const initialPortfolioValue = 460000;
 
 // Generate BTC, MSTR, SOL, and SOL bot prices and portfolio values
 function generateData() {
-    const mstrStartPrice = btcStartPrice * mstrNavPremium;
+    const mstrStartPrice = btcStartPrice * 3;
     let mstrEndPrice = btcEndPrice * mstrNavPremium;
     const btcPrices = [];
     const mstrPrices = [];
