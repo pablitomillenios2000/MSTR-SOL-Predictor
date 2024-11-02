@@ -8,30 +8,13 @@ const months = [
 // Initial and final BTC, MSTR, and SOL prices
 const btcStartPrice = 69000;
 const btcEndPrice = 400000;
-const mstrStartPrice = btcStartPrice * 1.5;
+const mstrStartPrice = btcStartPrice * 3; // NAV premium of 3
 const solStartPrice = 166;
 const solEndPrice = 1800;
+const mstrEndPrice = btcEndPrice * 3;
 
-// Initial portfolio value
+// Initial portfolio value for both portfolios
 const initialPortfolioValue = 460000;
-
-// Portfolio allocations
-const allocationsSolBotPortfolio = {
-    BTC: 0.5 * initialPortfolioValue,
-    SOL: 0.25 * initialPortfolioValue,
-    SOL_BOT: 0.25 * initialPortfolioValue
-};
-
-const allocationsMstrPortfolio = {
-    BTC: 0.5 * initialPortfolioValue,
-    MSTR: 0.5 * initialPortfolioValue
-};
-
-// Exponential growth factors for MSTR and SOL within the given range
-const mstrGrowthFactor = Math.pow(mstrStartPrice / btcStartPrice, 1 / (months.length - 1));
-const solGrowthFactor = Math.pow(solEndPrice / solStartPrice, 1 / (months.length - 1));
-const btcGrowthFactor = Math.pow(btcEndPrice / btcStartPrice, 1 / (months.length - 1));
-const solBotMultiplier = 5; // SOL bot’s multiplier
 
 // Generate BTC, MSTR, SOL, and SOL bot prices and portfolio values
 function generateData() {
@@ -42,34 +25,32 @@ function generateData() {
     const portfolioSolBot = [];
     const portfolioMstr = [];
 
-    let btcPrice = btcStartPrice;
-    let mstrPrice = mstrStartPrice;
-    let solPrice = solStartPrice;
-
     for (let i = 0; i < months.length; i++) {
-        // Calculate BTC, MSTR, and SOL prices using exponential growth
+        // Calculate BTC price with exponential growth (parabolic shape)
+        const btcGrowthFactor = Math.pow(btcEndPrice / btcStartPrice, i / (months.length - 1));
+        const btcPrice = btcStartPrice * btcGrowthFactor;
         btcPrices.push(btcPrice);
+
+        // Calculate MSTR price with exponential growth
+        const mstrGrowthFactor = Math.pow(mstrEndPrice / mstrStartPrice, i / (months.length - 1));
+        const mstrPrice = mstrStartPrice * mstrGrowthFactor;
         mstrPrices.push(mstrPrice);
+
+        // Calculate SOL price with exponential growth
+        const solGrowthFactor = Math.pow(solEndPrice / solStartPrice, i / (months.length - 1));
+        const solPrice = solStartPrice * solGrowthFactor;
         solPrices.push(solPrice);
-        solBotPrices.push(solPrice * solBotMultiplier);
+
+        // Calculate SOL trading bot price (5x SOL growth)
+        const solBotPrice = solPrice * 5;
+        solBotPrices.push(solBotPrice);
 
         // Calculate portfolio values
-        const solBotPortfolioValue =
-            allocationsSolBotPortfolio.BTC * (btcPrice / btcStartPrice) +
-            allocationsSolBotPortfolio.SOL * (solPrice / solStartPrice) +
-            allocationsSolBotPortfolio.SOL_BOT * (solPrice * solBotMultiplier / solStartPrice);
-
-        const mstrPortfolioValue =
-            allocationsMstrPortfolio.BTC * (btcPrice / btcStartPrice) +
-            allocationsMstrPortfolio.MSTR * (mstrPrice / mstrStartPrice);
+        const solBotPortfolioValue = initialPortfolioValue * (solBotPrice / (solStartPrice * 5));
+        const mstrPortfolioValue = initialPortfolioValue * (mstrPrice / mstrStartPrice);
 
         portfolioSolBot.push(solBotPortfolioValue);
         portfolioMstr.push(mstrPortfolioValue);
-
-        // Update prices for next month using exponential growth factors
-        btcPrice *= btcGrowthFactor;
-        mstrPrice *= mstrGrowthFactor;
-        solPrice *= solGrowthFactor;
     }
 
     return { months, btcPrices, mstrPrices, solPrices, solBotPrices, portfolioSolBot, portfolioMstr };
@@ -132,11 +113,11 @@ function plotData(data) {
         line: { width: 3, color: 'blue' }
     };
 
-    // Define layout
+    // Define layout without logarithmic scale on y-axis
     const layout = {
         title: 'Projected Portfolio Values: SOL Trading Bot vs. MSTR',
         xaxis: { title: 'Date' },
-        yaxis: { title: 'Value (USD)', type: 'log' }, // Log scale to better visualize differences
+        yaxis: { title: 'Value (USD)' }, // Linear scale for y-axis
     };
 
     // Plot the chart
