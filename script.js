@@ -5,19 +5,21 @@ const months = [
     '2025-09', '2025-10'
 ];
 
-// Initial and final BTC, MSTR, and SOL prices
+// Initial and final BTC prices
 const btcStartPrice = 69000;
 const btcEndPrice = 400000;
-const mstrStartPrice = btcStartPrice * 3; // NAV premium of 3
 const solStartPrice = 166;
-const solEndPrice = 1800;
-const mstrEndPrice = btcEndPrice * 3;
+let mstrNavPremium = 3; // Initial NAV premium for MSTR
+let solEndPrice = 1800; // Initial SOL end price
 
 // Initial portfolio value for both portfolios
 const initialPortfolioValue = 460000;
 
 // Generate BTC, MSTR, SOL, and SOL bot prices and portfolio values
 function generateData() {
+    const mstrStartPrice = btcStartPrice * mstrNavPremium;
+    const mstrEndPrice = 3000;
+
     const btcPrices = [];
     const mstrPrices = [];
     const solPrices = [];
@@ -26,7 +28,7 @@ function generateData() {
     const portfolioMstr = [];
 
     for (let i = 0; i < months.length; i++) {
-        // Calculate BTC price with exponential growth (parabolic shape)
+        // Calculate BTC price with exponential growth
         const btcGrowthFactor = Math.pow(btcEndPrice / btcStartPrice, i / (months.length - 1));
         const btcPrice = btcStartPrice * btcGrowthFactor;
         btcPrices.push(btcPrice);
@@ -58,7 +60,6 @@ function generateData() {
 
 // Plot the data
 function plotData(data) {
-    // Define traces for BTC, MSTR, SOL, SOL Bot, and both portfolio values
     const btcTrace = {
         x: data.months,
         y: data.btcPrices,
@@ -113,17 +114,28 @@ function plotData(data) {
         line: { width: 3, color: 'blue' }
     };
 
-    // Define layout without logarithmic scale on y-axis
     const layout = {
         title: 'Projected Portfolio Values: SOL Trading Bot vs. MSTR',
         xaxis: { title: 'Date' },
-        yaxis: { title: 'Value (USD)' }, // Linear scale for y-axis
+        yaxis: { title: 'Value (USD)' }
     };
 
-    // Plot the chart
     Plotly.newPlot('chart', [btcTrace, mstrTrace, solTrace, solBotTrace, portfolioSolBotTrace, portfolioMstrTrace], layout);
 }
 
-// Generate data and plot
-const data = generateData();
+// Initialize the chart with default values
+let data = generateData();
 plotData(data);
+
+// Listen for input changes
+document.getElementById('mstrNavPremium').addEventListener('input', (event) => {
+    mstrNavPremium = parseFloat(event.target.value);
+    data = generateData(); // Regenerate data with the new NAV premium
+    plotData(data); // Update the chart
+});
+
+document.getElementById('solEndPrice').addEventListener('input', (event) => {
+    solEndPrice = parseFloat(event.target.value);
+    data = generateData(); // Regenerate data with the new SOL end price
+    plotData(data); // Update the chart
+});
