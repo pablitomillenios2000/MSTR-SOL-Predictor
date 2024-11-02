@@ -65,7 +65,7 @@ function plotData(data) {
         type: 'scatter',
         mode: 'lines',
         name: 'BTC Price',
-        line: { width: 2 }
+        line: { width: 2, color: 'orange' }
     };
 
     const mstrTrace = {
@@ -74,7 +74,7 @@ function plotData(data) {
         type: 'scatter',
         mode: 'lines',
         name: 'MSTR Price (Exponential Growth)',
-        line: { width: 2, dash: 'dash' }
+        line: { width: 2, dash: 'dash', color: 'red' }
     };
 
     const solTrace = {
@@ -101,7 +101,7 @@ function plotData(data) {
         type: 'scatter',
         mode: 'lines',
         name: 'Portfolio with SOL Trading Bot',
-        line: { width: 3, color: 'green' }
+        line: { width: 3, color: 'purple' }
     };
 
     const portfolioMstrTrace = {
@@ -110,7 +110,7 @@ function plotData(data) {
         type: 'scatter',
         mode: 'lines',
         name: 'Portfolio with MSTR',
-        line: { width: 3, color: 'blue' }
+        line: { width: 3, color: 'red' }
     };
 
     const layout = {
