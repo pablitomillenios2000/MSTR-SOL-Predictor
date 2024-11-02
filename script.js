@@ -53,7 +53,7 @@ function generateData() {
         const solPrice = solStartPrice * solGrowthFactor;
         solPrices.push(solPrice);
 
-        // Calculate SOL bot price with a custom growth factor to reach 5x of solEndPrice
+        // Calculate SOL trading bot price with a custom growth factor to reach 5x of solEndPrice
         const solBotGrowthFactor = Math.pow(solBotEndPrice / solStartPrice, i / (months.length - 1));
         const solBotPrice = solStartPrice * solBotGrowthFactor;
         solBotPrices.push(solBotPrice);
@@ -71,11 +71,8 @@ function generateData() {
     return { months, btcPrices, mstrPrices, solPrices, solBotPrices, portfolioSolBot, portfolioMstr, portfolioSol };
 }
 
-
-
-
-// Plot the data
-function plotData(data) {
+// Plot the data with dynamic scale
+function plotData(data, scaleType = 'linear') {
     const btcTrace = {
         x: data.months,
         y: data.btcPrices,
@@ -142,28 +139,35 @@ function plotData(data) {
     const layout = {
         title: 'Projected Portfolio Values: SOL Trading Bot vs. MSTR vs. SOL (No Bot)',
         xaxis: { title: 'Date' },
-        yaxis: { title: 'Value (USD)' }
+        yaxis: { title: 'Value (USD)', type: scaleType }
     };
 
     Plotly.newPlot('chart', [
         btcTrace, mstrTrace, solTrace, solBotTrace,
-        portfolioSolBotTrace, portfolioMstrTrace, portfolioSolTrace // Add new trace here
+        portfolioSolBotTrace, portfolioMstrTrace, portfolioSolTrace
     ], layout);
 }
 
 // Initialize the chart with default values
 let data = generateData();
-plotData(data);
+let scaleType = 'linear';
+plotData(data, scaleType);
 
-// Listen for input changes
+// Toggle scale button
+document.getElementById('toggleScale').addEventListener('click', () => {
+    scaleType = scaleType === 'linear' ? 'log' : 'linear';
+    plotData(data, scaleType); // Update the chart with the new scale type
+});
+
+// Input listeners for dynamic updates
 document.getElementById('mstrNavPremium').addEventListener('input', (event) => {
     mstrNavPremium = parseFloat(event.target.value);
-    data = generateData(); // Regenerate data with the new NAV premium
-    plotData(data); // Update the chart
+    data = generateData();
+    plotData(data, scaleType); // Update the chart with current scale
 });
 
 document.getElementById('solEndPrice').addEventListener('input', (event) => {
     solEndPrice = parseFloat(event.target.value);
-    data = generateData(); // Regenerate data with the new SOL end price
-    plotData(data); // Update the chart
+    data = generateData();
+    plotData(data, scaleType); // Update the chart with current scale
 });
