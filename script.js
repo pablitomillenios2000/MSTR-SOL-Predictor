@@ -171,3 +171,9 @@ document.getElementById('solEndPrice').addEventListener('input', (event) => {
     data = generateData();
     plotData(data, scaleType); // Update the chart with current scale
 });
+
+document.getElementById('initialNAVFactor').addEventListener('input', (event) => {
+    initialNAVFactor = parseFloat(event.target.value);
+    data = generateData();
+    plotData(data, scaleType); // Update the chart with current scale
+});
