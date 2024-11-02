@@ -115,7 +115,7 @@ function plotData(data, scaleType = 'linear') {
         type: 'scatter',
         mode: 'lines',
         name: 'Portfolio with SOL Trading Bot',
-        line: { width: 3, color: 'purple' }
+        line: { width: 3, color: '#7F00FF' }
     };
 
     const portfolioMstrTrace = {
@@ -133,7 +133,7 @@ function plotData(data, scaleType = 'linear') {
         type: 'scatter',
         mode: 'lines',
         name: 'Portfolio with SOL (No Trading Bot)',
-        line: { width: 3, color: 'green' }
+        line: { width: 3, color: 'purple' }
     };
 
     const layout = {
